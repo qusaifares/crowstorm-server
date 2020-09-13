@@ -5,6 +5,7 @@ import { statesList } from '../../middleware/statesList';
 import { VirtualType } from 'mongoose';
 
 const { Schema } = mongoose;
+const { Types } = Schema;
 
 export interface IUser extends mongoose.Document {
   name: {
@@ -12,7 +13,6 @@ export interface IUser extends mongoose.Document {
     lastName: string;
     fullName: string;
   };
-  username: string;
   email: string;
   password: string;
   address: {
@@ -33,29 +33,22 @@ const UserSchema = new Schema(
         type: String,
         required: true,
         trim: true,
-        maxlength: [20, 'First name is too long']
+        maxlength: [20, 'First name is too long'],
       },
       lastName: {
         type: String,
         required: true,
         trim: true,
-        maxlength: [20, 'Last name is too long']
-      }
-    },
-    username: {
-      type: String,
-      unique: true,
-      trim: true,
-      minlength: [3, 'Username is too short'],
-      maxlength: [20, 'Username is too long']
+        maxlength: [20, 'Last name is too long'],
+      },
     },
     email: {
       type: String,
       unique: true,
       validate: {
         validator: (e: string): boolean => emailRegex.test(e),
-        message: ({ value }) => `${value} is not a valid email`
-      }
+        message: ({ value }) => `${value} is not a valid email`,
+      },
     },
     password: { type: String, required: true, select: false },
     address: {
@@ -68,12 +61,12 @@ const UserSchema = new Schema(
         validate: {
           validator: (z: string): boolean => zipRegex.test(z),
           message: ({ value }: { value: string }) =>
-            `${value} is not a valid zip code`
-        }
-      }
+            `${value} is not a valid zip code`,
+        },
+      },
     },
     orders: [{ type: Schema.Types.ObjectId, ref: 'Order' }],
-    createdAt: { type: Date, default: Date.now }
+    createdAt: { type: Date, default: Date.now },
   },
   {}
 );
