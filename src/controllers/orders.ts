@@ -14,7 +14,7 @@ router.get('/', async (req: Request, res: Response) => {
 });
 
 // Get one order by id
-router.get('/:id', async (req: Request, res: Response) => {
+router.get('/:id/', async (req: Request, res: Response) => {
   try {
     const order = await Order.findById(req.params.id);
     res.json(order);
@@ -24,7 +24,7 @@ router.get('/:id', async (req: Request, res: Response) => {
 });
 
 // Create an order
-router.post('/new', async (req: Request, res: Response) => {
+router.post('/', async (req: Request, res: Response) => {
   try {
     const order = await Order.create(req.body);
     res.json(order);
@@ -34,7 +34,7 @@ router.post('/new', async (req: Request, res: Response) => {
 });
 
 // Find an order by id and update
-router.put('/:id/update', async (req: Request, res: Response) => {
+router.put('/:id/', async (req: Request, res: Response) => {
   try {
     const order = await Order.findByIdAndUpdate(
       req.params.id,
@@ -42,6 +42,15 @@ router.put('/:id/update', async (req: Request, res: Response) => {
       { new: true }
     );
     res.json(order);
+  } catch (err) {
+    res.status(500).send(err);
+  }
+});
+
+router.delete('/:id/', async (req: Request, res: Response) => {
+  try {
+    const order = await Order.findByIdAndDelete(req.params.id);
+    res.sendStatus(204);
   } catch (err) {
     res.status(500).send(err);
   }
