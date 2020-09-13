@@ -5,12 +5,17 @@ import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import passport from 'passport';
 import passportConfig from './middleware/passportConfig';
+import hours from './helpers/hours';
 
 require('dotenv').config();
 
 const app: Application = express();
 
-const COOKIE_SECRET: string = process.env.COOKIE_SECRET!;
+const {
+  SESSION_NAME = 'sid',
+  SESSION_HOURS = 24,
+  SESSION_SECRET = 'cookie-secret-code'
+} = process.env;
 
 // Middleware
 app.use(express.json());
@@ -18,17 +23,21 @@ app.use(express.urlencoded({ extended: true }));
 app.use(
   cors({
     origin: true,
-    credentials: true,
+    credentials: true
   })
 );
 app.use(
   session({
-    secret: COOKIE_SECRET,
+    name: SESSION_NAME,
+    secret: SESSION_SECRET,
     resave: true,
-    saveUninitialized: true,
+    saveUninitialized: false,
+    cookie: {
+      maxAge: hours(SESSION_HOURS)
+    }
   })
 );
-app.use(cookieParser(COOKIE_SECRET));
+app.use(cookieParser(SESSION_SECRET));
 app.use(passport.initialize());
 app.use(passport.session());
 passportConfig(passport);

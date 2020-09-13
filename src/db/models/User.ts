@@ -1,7 +1,7 @@
 // import { Document, Model } from 'mongoose';
 import mongoose from '../connection';
-import { emailRegex, zipRegex } from '../../middleware/validationRegex';
-import { statesList } from '../../middleware/statesList';
+import { emailRegex, zipRegex } from '../../helpers/validationRegex';
+import { statesList } from '../../helpers/statesList';
 import { VirtualType } from 'mongoose';
 
 const { Schema } = mongoose;
@@ -9,9 +9,9 @@ const { Types } = Schema;
 
 export interface IUser extends mongoose.Document {
   name: {
-    firstName: string;
-    lastName: string;
-    fullName: string;
+    first: string;
+    last: string;
+    full: string;
   };
   email: string;
   password: string;
@@ -29,26 +29,26 @@ export interface IUser extends mongoose.Document {
 const UserSchema = new Schema(
   {
     name: {
-      firstName: {
+      first: {
         type: String,
         required: true,
         trim: true,
-        maxlength: [20, 'First name is too long'],
+        maxlength: [20, 'First name is too long']
       },
-      lastName: {
+      last: {
         type: String,
         required: true,
         trim: true,
-        maxlength: [20, 'Last name is too long'],
-      },
+        maxlength: [20, 'Last name is too long']
+      }
     },
     email: {
       type: String,
       unique: true,
       validate: {
         validator: (e: string): boolean => emailRegex.test(e),
-        message: ({ value }) => `${value} is not a valid email`,
-      },
+        message: ({ value }) => `${value} is not a valid email`
+      }
     },
     password: { type: String, required: true, select: false },
     address: {
@@ -61,12 +61,12 @@ const UserSchema = new Schema(
         validate: {
           validator: (z: string): boolean => zipRegex.test(z),
           message: ({ value }: { value: string }) =>
-            `${value} is not a valid zip code`,
-        },
-      },
+            `${value} is not a valid zip code`
+        }
+      }
     },
     orders: [{ type: Schema.Types.ObjectId, ref: 'Order' }],
-    createdAt: { type: Date, default: Date.now },
+    createdAt: { type: Date, default: Date.now }
   },
   {}
 );
@@ -74,9 +74,8 @@ const UserSchema = new Schema(
 UserSchema.set('toObject', { virtuals: true });
 UserSchema.set('toJSON', { virtuals: true });
 
-UserSchema.virtual('name.fullName').get(
-  (value: any, virtual: any, doc: IUser) =>
-    `${doc.name.firstName} ${doc.name.lastName}`
+UserSchema.virtual('name.full').get(
+  (value: any, virtual: any, doc: IUser) => `${doc.name.first} ${doc.name.last}`
 );
 
 interface Address {

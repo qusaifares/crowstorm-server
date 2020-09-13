@@ -6,7 +6,7 @@ import { IUser } from '../db/models/User';
 
 const passportConfig = (passport: PassportStatic) => {
   passport.use(
-    new LocalStrategy((email, password, done) => {
+    new LocalStrategy({ usernameField: 'email' }, (email, password, done) => {
       User.findOne({ email: email }, (err, user) => {
         if (err) throw err;
         if (!user) return done(null, false);
@@ -15,21 +15,23 @@ const passportConfig = (passport: PassportStatic) => {
           if (result) {
             return done(null, user);
           } else {
-            return done(null, false);
+            return done('Incorrect password', false);
           }
         });
-      });
+      }).select('+password');
     })
   );
 
   passport.serializeUser((user: IUser, cb) => {
+    console.log(2);
     cb(null, user.id);
   });
+
   passport.deserializeUser((id, cb) => {
     User.findOne({ _id: id }, (err, user) => {
       if (!user) return cb(err, false);
       const userInformation = {
-        email: user.email,
+        email: user.email
       };
       cb(err, userInformation);
     });

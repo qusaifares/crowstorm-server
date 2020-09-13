@@ -1,5 +1,6 @@
 import express, { Router, Request, Response } from 'express';
 import Product from '../db/models/Product';
+import dotNotate from '../helpers/dotNotate';
 
 const router: Router = express.Router();
 
@@ -14,7 +15,7 @@ router.get('/', async (req: Request, res: Response) => {
 });
 
 // Get one product by id
-router.get('/:id/', async (req: Request, res: Response) => {
+router.get('/:id', async (req: Request, res: Response) => {
   try {
     const product = await Product.findById(req.params.id);
     res.json(product);
@@ -34,11 +35,11 @@ router.post('/', async (req: Request, res: Response) => {
 });
 
 // Find a product by id and update
-router.put('/:id/', async (req: Request, res: Response) => {
+router.put('/:id', async (req: Request, res: Response) => {
   try {
     const product = await Product.findByIdAndUpdate(
       req.params.id,
-      { $set: req.body },
+      { $set: dotNotate(req.body) },
       { new: true }
     );
     res.json(product);
@@ -48,7 +49,7 @@ router.put('/:id/', async (req: Request, res: Response) => {
 });
 
 // Delete a product by id
-router.delete('/:id/', async (req: Request, res: Response) => {
+router.delete('/:id', async (req: Request, res: Response) => {
   try {
     const product = await Product.findByIdAndDelete(req.params.id);
     res.sendStatus(204);
