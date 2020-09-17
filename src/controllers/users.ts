@@ -13,7 +13,7 @@ router.get('/', async (req: Request, res: Response) => {
     const users = await User.find();
     res.json(users);
   } catch (err) {
-    res.status(404).send(err);
+    res.status(404).json({ name: err.name, message: err.message });
   }
 });
 
@@ -23,7 +23,7 @@ router.get('/:id', async (req: Request, res: Response) => {
     const user = await User.findById(req.params.id);
     res.json(user);
   } catch (err) {
-    res.status(404).send(err);
+    res.status(404).json({ name: err.name, message: err.message });
   }
 });
 
@@ -37,7 +37,7 @@ router.put('/:id', async (req: Request, res: Response) => {
     );
     res.json(user);
   } catch (err) {
-    res.status(500).send(err);
+    res.status(500).json({ name: err.name, message: err.message });
   }
 });
 
@@ -47,20 +47,23 @@ router.delete('/:id', async (req: Request, res: Response) => {
     const user = await User.findByIdAndDelete(req.params.id);
     res.sendStatus(204);
   } catch (err) {
-    res.status(500).send(err);
+    res.status(500).json({ name: err.name, message: err.message });
   }
 });
 
 // Register a user
 router.post('/register', async (req: Request, res: Response) => {
   try {
-    const userToCheck = await User.find({ email: req.body.email });
+    const userToCheck = await User.findOne({ email: req.body.email });
+    console.log('one');
+    console.log(userToCheck);
     if (userToCheck) throw new Error('User already exists with that email');
+    console.log('two');
     const hashedPassword = await bcrypt.hash(req.body.password, 10);
     const user = await User.create({ ...req.body, password: hashedPassword });
     res.json(user);
   } catch (err) {
-    res.status(500).send(err);
+    res.status(400).json({ name: err.name, message: err.message });
   }
 });
 
@@ -75,8 +78,8 @@ router.post('/persist', (req: Request, res: Response, next: NextFunction) => {
     } else {
       throw new Error('Not allowed');
     }
-  } catch (error) {
-    res.status(400).send(error);
+  } catch (err) {
+    res.status(400).json({ name: err.name, message: err.message });
   }
 });
 
@@ -95,8 +98,8 @@ router.post('/login', (req: Request, res: Response, next: NextFunction) => {
         delete userData.password;
         res.json(userData);
       });
-    } catch (error) {
-      res.send(error);
+    } catch (err) {
+      res.json({ name: err.name, message: err.message });
     }
   })(req, res, next);
 });
@@ -111,8 +114,8 @@ router.post('/logout', (req: Request, res: Response) => {
         res.send('Logged out successfully');
       }
     });
-  } catch (error) {
-    res.status(400).send(error);
+  } catch (err) {
+    res.status(400).json({ name: err.name, message: err.message });
   }
 });
 
@@ -121,7 +124,7 @@ router.get('/user', (req: Request, res: Response) => {
     if (!req.user) throw new Error('No user');
     res.json(req.user);
   } catch (err) {
-    res.status(400).send(err);
+    res.status(400).json({ name: err.name, message: err.message });
   }
 });
 
