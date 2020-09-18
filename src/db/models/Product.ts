@@ -14,7 +14,7 @@ export enum Color {
   Purple = 'purple',
   Brown = 'brown',
   Gray = 'gray',
-  Pink = 'pink',
+  Pink = 'pink'
 }
 
 // Enum of product types (Keep consistent with client side)
@@ -24,6 +24,7 @@ export enum ProductType {
   Pants = 'pants',
   Watch = 'watch',
   Footwear = 'footwear',
+  Other = 'other'
 }
 
 export interface Rating {
@@ -37,6 +38,7 @@ export interface IProduct {
   price: number;
   productType: ProductType;
   colors: Color[];
+  images: string[];
   ratingData: {
     stars: number;
     ratings: Rating[];
@@ -50,19 +52,20 @@ const ProductSchema = new Schema({
   price: { type: Number },
   productType: {
     type: String,
-    enum: Object.values(ProductType),
+    enum: Object.values(ProductType)
   },
   colors: [{ type: String, enum: Object.values(Color) }],
+  images: [{ type: String }],
   ratingData: {
     stars: { type: Number, min: 0, max: 5 },
     ratings: [
       {
         user: { type: Schema.Types.ObjectId, ref: 'User' },
-        rating: { type: Number, min: 0, max: 5 },
-      },
-    ],
+        rating: { type: Number, min: 0, max: 5 }
+      }
+    ]
   },
-  createdAt: { type: Date, default: Date.now },
+  createdAt: { type: Date, default: Date.now }
 });
 
 const Product = mongoose.model('Product', ProductSchema);
