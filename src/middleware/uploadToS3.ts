@@ -9,14 +9,14 @@ import {
 
 const {
   AWS_BUCKET_NAME = 'crowstorm',
-  AWS_ACCESS_KEY,
-  AWS_SECRET,
+  AWS_ACCESS_KEY_ID,
+  AWS_SECRET_ACCESS_KEY,
   AWS_REGION
 } = process.env;
 
 aws.config.update({
-  secretAccessKey: AWS_SECRET,
-  accessKeyId: AWS_ACCESS_KEY,
+  secretAccessKey: AWS_SECRET_ACCESS_KEY,
+  accessKeyId: AWS_ACCESS_KEY_ID,
   region: AWS_REGION
 });
 
