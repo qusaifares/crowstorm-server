@@ -19,12 +19,12 @@ export enum Color {
 
 // Enum of product types (Keep consistent with client side)
 export enum ProductType {
-  Jacket = 'jacket',
-  Shirt = 'shirt',
-  Pants = 'pants',
-  Watch = 'watch',
-  Footwear = 'footwear',
-  Other = 'other'
+  Jacket = 'Jacket',
+  Shirt = 'Shirt',
+  Pants = 'Pants',
+  Watch = 'Watch',
+  Footwear = 'Footwear',
+  Other = 'Other'
 }
 
 export interface Rating {
@@ -36,6 +36,7 @@ export interface IProduct {
   title: string;
   description: string;
   price: number;
+  quantity: number;
   productType: ProductType;
   colors: Color[];
   images: string[];
@@ -54,6 +55,7 @@ const ProductSchema = new Schema({
     type: String,
     enum: Object.values(ProductType)
   },
+  quantity: { type: Number },
   colors: [{ type: String, enum: Object.values(Color) }],
   images: [{ type: String }],
   ratingData: {
