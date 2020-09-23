@@ -6,6 +6,10 @@ import cookieParser from 'cookie-parser';
 import passport from 'passport';
 import passportConfig from './middleware/passportConfig';
 import hours from './helpers/hours';
+import connectMongo from 'connect-mongo';
+import mongoose from './db/connection';
+
+const MongoStore = connectMongo(session);
 
 require('dotenv').config();
 
@@ -26,6 +30,7 @@ app.use(
     credentials: true
   })
 );
+console.log(process.env.NODE_ENV);
 app.use(
   session({
     name: SESSION_NAME,
@@ -34,7 +39,8 @@ app.use(
     saveUninitialized: false,
     cookie: {
       maxAge: hours(SESSION_HOURS)
-    }
+    },
+    store: new MongoStore({ mongooseConnection: mongoose.connection })
   })
 );
 app.use(cookieParser(SESSION_SECRET));
