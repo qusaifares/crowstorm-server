@@ -30,7 +30,7 @@ app.use(
     credentials: true
   })
 );
-console.log(process.env.NODE_ENV);
+
 app.use(
   session({
     name: SESSION_NAME,
@@ -58,7 +58,7 @@ app.use('/products', productsController);
 app.use('/orders', ordersController);
 
 // Server
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 8080;
 
 app.listen(PORT, () => {
   console.log(`Server running on port: ${PORT}`);
