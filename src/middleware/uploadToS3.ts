@@ -27,7 +27,7 @@ export const uploadToS3 = async (
   id: string,
   folderName: string = ''
 ) => {
-  const allowedFormats = ['png', 'jpg', 'jpeg'];
+  const allowedFormats = ['png', 'jpg', 'jpeg', 'webp'];
   const imageType = base64ImageType(data);
   const fileFormat = base64FileFormat(data);
   const buffer = base64ToBuffer(data);
