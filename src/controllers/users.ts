@@ -55,10 +55,9 @@ router.delete('/:id', async (req: Request, res: Response) => {
 router.post('/register', async (req: Request, res: Response) => {
   try {
     const userToCheck = await User.findOne({ email: req.body.email });
-    console.log('one');
-    console.log(userToCheck);
+
     if (userToCheck) throw new Error('User already exists with that email');
-    console.log('two');
+
     const hashedPassword = await bcrypt.hash(req.body.password, 10);
     const user = await User.create({ ...req.body, password: hashedPassword });
     res.json(user);

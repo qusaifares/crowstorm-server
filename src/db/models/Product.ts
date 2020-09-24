@@ -4,17 +4,17 @@ const { Schema } = mongoose;
 
 // Enum of colors (Keep consistent with client side)
 export enum Color {
-  White = 'white',
-  Black = 'black',
-  Red = 'red',
-  Orange = 'orange',
-  Yellow = 'yellow',
-  Green = 'green',
-  Blue = 'blue',
-  Purple = 'purple',
-  Brown = 'brown',
-  Gray = 'gray',
-  Pink = 'pink'
+  White = 'White',
+  Black = 'Black',
+  Red = 'Red',
+  Orange = 'Orange',
+  Yellow = 'Yellow',
+  Green = 'Green',
+  Blue = 'Blue',
+  Purple = 'Purple',
+  Brown = 'Brown',
+  Gray = 'Gray',
+  Pink = 'Pink'
 }
 
 // Enum of product types (Keep consistent with client side)
@@ -38,7 +38,7 @@ export interface IProduct {
   price: number;
   quantity: number;
   productType: ProductType;
-  colors: Color[];
+  color: Color;
   images: string[];
   ratingData: {
     stars: number;
@@ -56,7 +56,7 @@ const ProductSchema = new Schema({
     enum: Object.values(ProductType)
   },
   quantity: { type: Number },
-  colors: [{ type: String, enum: Object.values(Color) }],
+  color: { type: String, enum: Object.values(Color) },
   images: [{ type: String }],
   ratingData: {
     stars: { type: Number, min: 0, max: 5 },

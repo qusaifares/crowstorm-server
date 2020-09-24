@@ -8,7 +8,15 @@ const router: Router = express.Router();
 // Get all products
 router.get('/', async (req: Request, res: Response) => {
   try {
-    const products = await Product.find();
+    const { limit, skip } = req.query;
+    let productsQuery = Product.find();
+    if (skip && typeof skip === 'string') {
+      productsQuery = productsQuery.skip(parseInt(skip));
+    }
+    if (limit && typeof limit === 'string') {
+      productsQuery = productsQuery.limit(parseInt(limit));
+    }
+    const products = await productsQuery.exec();
     res.json(products);
   } catch (err) {
     res.status(404).json({ name: err.name, message: err.message });
