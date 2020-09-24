@@ -19,11 +19,14 @@ export enum Color {
 
 // Enum of product types (Keep consistent with client side)
 export enum ProductType {
-  Jacket = 'Jacket',
-  Shirt = 'Shirt',
+  Jackets = 'Jackets',
+  Sweaters = 'Sweaters',
+  Shirts = 'Shirts',
   Pants = 'Pants',
-  Watch = 'Watch',
+  Watches = 'Watches',
   Footwear = 'Footwear',
+  Socks = 'Socks',
+  Underwear = 'Underwear',
   Other = 'Other'
 }
 
@@ -52,11 +55,14 @@ const ProductSchema = new Schema({
   description: { type: String },
   price: { type: Number },
   productType: {
-    type: String,
-    enum: Object.values(ProductType)
+    type: String
+    // enum: Object.values(ProductType)
   },
   quantity: { type: Number },
-  color: { type: String, enum: Object.values(Color) },
+  color: {
+    type: String
+    // enum: Object.values(Color)
+  },
   images: [{ type: String }],
   ratingData: {
     stars: { type: Number, min: 0, max: 5 },

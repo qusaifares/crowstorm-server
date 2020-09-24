@@ -11,9 +11,7 @@ import mongoose from './db/connection';
 
 const MongoStore = connectMongo(session);
 
-if (process.env.NODE_ENV !== 'production') {
-  require('dotenv').config();
-}
+require('dotenv').config();
 
 const app: Application = express();
 
