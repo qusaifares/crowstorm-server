@@ -1,10 +1,9 @@
-import User from '../db/models/User';
+import User, { IUser } from '../db/models/User';
 import bcrypt from 'bcrypt';
 import { Strategy as LocalStrategy } from 'passport-local';
 import { PassportStatic } from 'passport';
-import { IUser } from '../db/models/User';
 
-const passportConfig = (passport: PassportStatic) => {
+const passportLocal = (passport: PassportStatic) => {
   passport.use(
     new LocalStrategy({ usernameField: 'email' }, (email, password, done) => {
       User.findOne({ email: email }, (err, user) => {
@@ -38,4 +37,4 @@ const passportConfig = (passport: PassportStatic) => {
   });
 };
 
-export default passportConfig;
+export default passportLocal;

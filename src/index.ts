@@ -3,15 +3,15 @@ import express, { Application } from 'express';
 import session from 'express-session';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
+require('dotenv').config();
 import passport from 'passport';
-import passportConfig from './middleware/passportConfig';
+import passportLocal from './middleware/passportLocal';
+import passportCustom from './middleware/passportCustom';
 import hours from './helpers/hours';
 import connectMongo from 'connect-mongo';
 import mongoose from './db/connection';
 
 const MongoStore = connectMongo(session);
-
-require('dotenv').config();
 
 const app: Application = express();
 
@@ -45,7 +45,8 @@ app.use(
 app.use(cookieParser(SESSION_SECRET));
 app.use(passport.initialize());
 app.use(passport.session());
-passportConfig(passport);
+passportLocal(passport);
+passportCustom(passport);
 
 // Controllers
 import usersController from './controllers/users';

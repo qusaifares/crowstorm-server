@@ -80,20 +80,29 @@ router.post('/persist', (req: Request, res: Response, next: NextFunction) => {
   }
 });
 
-router.get(
-  '/google',
-  passport.authenticate('google', {
-    scope: ['profile', 'email']
-  })
-);
+router.post('/google', (req: Request, res: Response, next: NextFunction) => {
+  passport.authenticate('client-google', (err, user, info) => {
+    try {
+      if (err) throw new Error(err);
+      if (!user) throw new Error('No user exists');
+      req.login(user, (err) => {
+        if (err) throw err;
+        if (req.session) req.session.user = user;
+        let userData = { ...user._doc };
+        if (userData.password !== undefined) delete userData.password;
+        res.json(userData);
+      });
+    } catch (error) {
+      res.json({ name: err.name, message: err.message });
+    }
+  })(req, res, next);
+});
 
 // Login
 router.post('/login', (req: Request, res: Response, next: NextFunction) => {
   passport.authenticate('local', (err, user, info) => {
     try {
-      if (err) {
-        throw new Error(err);
-      }
+      if (err) throw new Error(err);
       if (!user) throw new Error('No user exists');
       req.login(user, (err) => {
         if (err) throw err;
