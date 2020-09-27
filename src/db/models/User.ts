@@ -2,28 +2,37 @@
 import mongoose from '../connection';
 import { emailRegex, zipRegex } from '../../helpers/validationRegex';
 import { statesList } from '../../helpers/statesList';
-import { VirtualType } from 'mongoose';
+import bcrypt from 'bcrypt';
 
 const { Schema } = mongoose;
 const { Types } = Schema;
+
+interface Address {
+  street: string;
+  city: string;
+  state: string;
+  country: string;
+  zip: string;
+}
 
 export interface IUser extends mongoose.Document {
   name: {
     first: string;
     last: string;
-    full: string;
+    full?: string;
   };
-  email: string;
-  password: string;
-  address: {
+  email?: string;
+  password?: string;
+  address?: {
     street: string;
     city: string;
     state: string;
     country: string;
     zip: string;
   };
-  orders: string[];
-  createdAt: Date;
+  orders?: string[];
+  googleId?: string;
+  createdAt?: Date;
 }
 
 const UserSchema = new Schema(
@@ -66,6 +75,7 @@ const UserSchema = new Schema(
       }
     },
     orders: [{ type: Schema.Types.ObjectId, ref: 'Order' }],
+    googleId: String,
     createdAt: { type: Date, default: Date.now }
   },
   {}
@@ -78,13 +88,12 @@ UserSchema.virtual('name.full').get(
   (value: any, virtual: any, doc: IUser) => `${doc.name.first} ${doc.name.last}`
 );
 
-interface Address {
-  street: string;
-  city: string;
-  state: string;
-  country: string;
-  zip: string;
-}
+UserSchema.pre<IUser>('save', async function (next) {
+  if (this.password && this.isModified('password')) {
+    this.password = await bcrypt.hash(this.password, 10);
+  }
+  next();
+});
 
 const User = mongoose.model<IUser>('User', UserSchema);
 

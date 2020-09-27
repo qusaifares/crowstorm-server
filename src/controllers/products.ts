@@ -1,7 +1,9 @@
+import { IProduct } from './../db/models/Product';
 import { uploadToS3 } from './../middleware/uploadToS3';
 import express, { Router, Request, Response, NextFunction } from 'express';
 import Product from '../db/models/Product';
 import dotNotate from '../helpers/dotNotate';
+import mongoose from '../db/connection';
 
 const router: Router = express.Router();
 
@@ -43,7 +45,6 @@ router.post('/', async (req: Request, res: Response) => {
         // @ts-expect-error
         const imgName: string = await uploadToS3(img, product._id, 'products');
         if (imgName) {
-          //@ts-expect-error
           return product.images.push(imgName);
         }
       })
@@ -74,6 +75,26 @@ router.delete('/:id', async (req: Request, res: Response) => {
   try {
     const product = await Product.findByIdAndDelete(req.params.id);
     res.sendStatus(204);
+  } catch (err) {
+    res.status(500).json({ name: err.name, message: err.message });
+  }
+});
+
+router.put('/:id/addRating', async (req: Request, res: Response) => {
+  try {
+    const product = await Product.findById(req.params.id);
+    if (
+      product?.ratingData.ratings.find((rating) =>
+        rating.user.equals(req.body.user)
+      )
+    ) {
+      console.log('true');
+    } else {
+      console.log('false');
+    }
+    console.log(product?._id, req.params.id);
+    console.log(product?._id.equals(req.params.id));
+    res.json(product);
   } catch (err) {
     res.status(500).json({ name: err.name, message: err.message });
   }

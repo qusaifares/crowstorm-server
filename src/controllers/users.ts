@@ -1,9 +1,8 @@
 import express, { Router, Request, Response, NextFunction } from 'express';
 import passport from 'passport';
-import bcrypt from 'bcrypt';
 import User from '../db/models/User';
 import dotNotate from '../helpers/dotNotate';
-const { SESSION_NAME = 'sid' } = process.env;
+const { SESSION_NAME = 'connect.sid' } = process.env;
 
 const router: Router = express.Router();
 
@@ -58,8 +57,7 @@ router.post('/register', async (req: Request, res: Response) => {
 
     if (userToCheck) throw new Error('User already exists with that email');
 
-    const hashedPassword = await bcrypt.hash(req.body.password, 10);
-    const user = await User.create({ ...req.body, password: hashedPassword });
+    const user = await User.create(req.body);
     res.json(user);
   } catch (err) {
     res.status(400).json({ name: err.name, message: err.message });
@@ -81,6 +79,13 @@ router.post('/persist', (req: Request, res: Response, next: NextFunction) => {
     res.status(400).json({ name: err.name, message: err.message });
   }
 });
+
+router.get(
+  '/google',
+  passport.authenticate('google', {
+    scope: ['profile', 'email']
+  })
+);
 
 // Login
 router.post('/login', (req: Request, res: Response, next: NextFunction) => {

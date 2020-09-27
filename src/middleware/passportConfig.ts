@@ -9,8 +9,9 @@ const passportConfig = (passport: PassportStatic) => {
     new LocalStrategy({ usernameField: 'email' }, (email, password, done) => {
       User.findOne({ email: email }, (err, user) => {
         if (err) throw err;
+        // if user doesnt exist return
         if (!user) return done(null, false);
-        bcrypt.compare(password, user.password, (err, result) => {
+        bcrypt.compare(password, user.password as string, (err, result) => {
           if (err) throw err;
           if (result) {
             return done(null, user);

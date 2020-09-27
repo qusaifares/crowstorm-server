@@ -1,48 +1,51 @@
 import express, { Router, Request, Response } from 'express';
-import Order from '../db/models/Order';
+import Rating from '../db/models/Rating';
+import Product from '../db/models/Product';
 import dotNotate from '../helpers/dotNotate';
 
 const router: Router = express.Router();
 
-// Get all orders
+// Get all ratings
 router.get('/', async (req: Request, res: Response) => {
   try {
-    const orders = await Order.find();
-    res.json(orders);
+    const ratings = await Rating.find();
+    res.json(ratings);
   } catch (err) {
     res.status(404).json({ name: err.name, message: err.message });
   }
 });
 
-// Get one order by id
+// Get one rating by id
 router.get('/:id', async (req: Request, res: Response) => {
   try {
-    const order = await Order.findById(req.params.id);
-    res.json(order);
+    const rating = await Rating.findById(req.params.id);
+    res.json(rating);
   } catch (err) {
     res.status(404).json({ name: err.name, message: err.message });
   }
 });
 
-// Create an order
+// Create an rating
 router.post('/', async (req: Request, res: Response) => {
   try {
-    const order = await Order.create(req.body);
-    res.json(order);
+    const product = await Product.findById(req.body.product);
+    if (!product) throw new Error('Product not found');
+    const rating = await Rating.create(req.body);
+    res.json(rating);
   } catch (err) {
     res.status(500).json({ name: err.name, message: err.message });
   }
 });
 
-// Find an order by id and update
+// Find an rating by id and update
 router.put('/:id', async (req: Request, res: Response) => {
   try {
-    const order = await Order.findByIdAndUpdate(
+    const rating = await Rating.findByIdAndUpdate(
       req.params.id,
       { $set: dotNotate(req.body) },
       { new: true }
     );
-    res.json(order);
+    res.json(rating);
   } catch (err) {
     res.status(500).json({ name: err.name, message: err.message });
   }
@@ -50,7 +53,17 @@ router.put('/:id', async (req: Request, res: Response) => {
 
 router.delete('/:id', async (req: Request, res: Response) => {
   try {
-    const order = await Order.findByIdAndDelete(req.params.id);
+    const rating = await Rating.findByIdAndDelete(req.params.id);
+    res.sendStatus(204);
+  } catch (err) {
+    res.status(500).json({ name: err.name, message: err.message });
+  }
+});
+
+router.delete('/', async (req: Request, res: Response) => {
+  try {
+    const { user, product } = req.query;
+    await Rating.deleteOne({ user, product });
     res.sendStatus(204);
   } catch (err) {
     res.status(500).json({ name: err.name, message: err.message });

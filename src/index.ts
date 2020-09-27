@@ -33,7 +33,6 @@ app.use(
 
 app.use(
   session({
-    name: SESSION_NAME,
     secret: SESSION_SECRET,
     resave: true,
     saveUninitialized: false,

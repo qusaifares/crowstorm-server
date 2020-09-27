@@ -20,6 +20,7 @@
     "express-session": "^1.17.1",
     "mongoose": "^5.10.5",
     "passport": "^0.4.1",
+    "passport-google-oauth20": "^2.0.0",
     "passport-local": "^1.0.0",
     "path": "^0.12.7"
   },
@@ -34,6 +35,7 @@
     "@types/mongoose": "^5.7.36",
     "@types/node": "^14.11.1",
     "@types/passport": "^1.0.4",
+    "@types/passport-google-oauth20": "^2.0.4",
     "@types/passport-local": "^1.0.33",
     "@types/sharp": "^0.26.0",
     "dotenv": "^8.2.0",

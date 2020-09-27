@@ -1,4 +1,6 @@
 import mongoose from '../connection';
+import { IUser } from './User';
+import { IRating } from './Rating';
 
 const { Schema } = mongoose;
 
@@ -30,12 +32,7 @@ export enum ProductType {
   Other = 'Other'
 }
 
-export interface Rating {
-  user: string;
-  rating: number;
-}
-
-export interface IProduct {
+export interface IProduct extends mongoose.Document {
   title: string;
   description: string;
   price: number;
@@ -45,7 +42,7 @@ export interface IProduct {
   images: string[];
   ratingData: {
     stars: number;
-    ratings: Rating[];
+    ratings: IRating['_id'][];
   };
   createdAt: Date;
 }
@@ -76,6 +73,6 @@ const ProductSchema = new Schema({
   createdAt: { type: Date, default: Date.now }
 });
 
-const Product = mongoose.model('Product', ProductSchema);
+const Product = mongoose.model<IProduct>('Product', ProductSchema);
 
 export default Product;
