@@ -6,50 +6,6 @@ const { SESSION_NAME = 'connect.sid' } = process.env;
 
 const router: Router = express.Router();
 
-// Get all users
-router.get('/', async (req: Request, res: Response) => {
-  try {
-    const users = await User.find();
-    res.json(users);
-  } catch (err) {
-    res.status(404).json({ name: err.name, message: err.message });
-  }
-});
-
-// Get one user by id
-router.get('/:id', async (req: Request, res: Response) => {
-  try {
-    const user = await User.findById(req.params.id);
-    res.json(user);
-  } catch (err) {
-    res.status(404).json({ name: err.name, message: err.message });
-  }
-});
-
-// Find a user by id and update
-router.put('/:id', async (req: Request, res: Response) => {
-  try {
-    const user = await User.findByIdAndUpdate(
-      req.params.id,
-      { $set: dotNotate(req.body) },
-      { new: true }
-    );
-    res.json(user);
-  } catch (err) {
-    res.status(500).json({ name: err.name, message: err.message });
-  }
-});
-
-// Delete a user by id
-router.delete('/:id', async (req: Request, res: Response) => {
-  try {
-    const user = await User.findByIdAndDelete(req.params.id);
-    res.sendStatus(204);
-  } catch (err) {
-    res.status(500).json({ name: err.name, message: err.message });
-  }
-});
-
 // Register a user
 router.post('/register', async (req: Request, res: Response) => {
   try {
@@ -58,7 +14,11 @@ router.post('/register', async (req: Request, res: Response) => {
     if (userToCheck) throw new Error('User already exists with that email');
 
     const user = await User.create(req.body);
-    res.json(user);
+
+    req.login(req.session?.user, (err) => {
+      if (err) throw new Error('err');
+      res.json(req.user);
+    });
   } catch (err) {
     res.status(400).json({ name: err.name, message: err.message });
   }
@@ -132,12 +92,84 @@ router.post('/logout', (req: Request, res: Response) => {
   }
 });
 
-router.get('/user', (req: Request, res: Response) => {
+router.get('/user', async (req: Request, res: Response) => {
   try {
     if (!req.user) throw new Error('No user');
     res.json(req.user);
   } catch (err) {
     res.status(400).json({ name: err.name, message: err.message });
+  }
+});
+
+// Get cart
+router.get('/cart', async (req: Request, res: Response) => {
+  try {
+    if (!req.user) throw new Error('No user');
+    const user = await User.findById(req.session?.user._id).populate(
+      'cart.product'
+    );
+    res.json(user);
+  } catch (err) {
+    res.status(400).json({ name: err.name, message: err.message });
+  }
+});
+
+// Update cart
+router.put('/cart', async (req: Request, res: Response) => {
+  try {
+    if (!req.user) throw new Error('No user');
+    let user = await User.findById(req.session?.user._id);
+    if (!user) throw new Error('No user');
+    user.cart = req.body;
+    user.save();
+    let userPopulated = await user.populate('cart.product').execPopulate();
+    res.json(userPopulated);
+  } catch (err) {
+    res.status(400).json({ name: err.name, message: err.message });
+  }
+});
+
+// Get all users
+router.get('/', async (req: Request, res: Response) => {
+  try {
+    const users = await User.find();
+    res.json(users);
+  } catch (err) {
+    res.status(404).json({ name: err.name, message: err.message });
+  }
+});
+
+// Get one user by id
+router.get('/:id', async (req: Request, res: Response) => {
+  try {
+    const user = await User.findById(req.params.id);
+    res.json(user);
+  } catch (err) {
+    res.status(404).json({ name: err.name, message: err.message });
+  }
+});
+
+// Find a user by id and update
+router.put('/:id', async (req: Request, res: Response) => {
+  try {
+    const user = await User.findByIdAndUpdate(
+      req.params.id,
+      { $set: dotNotate(req.body) },
+      { new: true }
+    );
+    res.json(user);
+  } catch (err) {
+    res.status(500).json({ name: err.name, message: err.message });
+  }
+});
+
+// Delete a user by id
+router.delete('/:id', async (req: Request, res: Response) => {
+  try {
+    const user = await User.findByIdAndDelete(req.params.id);
+    res.sendStatus(204);
+  } catch (err) {
+    res.status(500).json({ name: err.name, message: err.message });
   }
 });
 

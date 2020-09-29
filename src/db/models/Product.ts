@@ -1,5 +1,4 @@
 import mongoose from '../connection';
-import { IUser } from './User';
 import { IRating } from './Rating';
 
 const { Schema } = mongoose;
@@ -37,14 +36,14 @@ export interface IProduct extends mongoose.Document {
   description: string;
   price: number;
   quantity: number;
-  productType: ProductType;
-  color: Color;
+  productType: ProductType | string;
+  color: Color | string;
   images: string[];
   ratingData: {
     stars: number;
     ratings: IRating['_id'][];
   };
-  createdAt: Date;
+  createdAt?: Date;
 }
 
 const ProductSchema = new Schema({

@@ -7,7 +7,6 @@ const passportCustom = (passport: PassportStatic) => {
   passport.use(
     'client-google',
     new CustomStrategy(async (req, done) => {
-      // @ts-ignore
       const { email, name } = req.body;
       try {
         const existingUser = await User.findOne({ email });

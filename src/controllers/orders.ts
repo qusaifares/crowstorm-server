@@ -1,6 +1,11 @@
 import express, { Router, Request, Response } from 'express';
 import Order from '../db/models/Order';
 import dotNotate from '../helpers/dotNotate';
+import Stripe from 'stripe';
+
+const strip = new Stripe(process.env.STRIPE_SECRET as string, {
+  apiVersion: '2020-08-27'
+});
 
 const router: Router = express.Router();
 
@@ -54,6 +59,13 @@ router.delete('/:id', async (req: Request, res: Response) => {
     res.sendStatus(204);
   } catch (err) {
     res.status(500).json({ name: err.name, message: err.message });
+  }
+});
+
+router.post('/checkout', async (req: Request, res: Response) => {
+  try {
+  } catch (error) {
+    console.log(error);
   }
 });
 

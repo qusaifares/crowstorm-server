@@ -22,7 +22,8 @@
     "passport": "^0.4.1",
     "passport-custom": "^1.1.1",
     "passport-local": "^1.0.0",
-    "path": "^0.12.7"
+    "path": "^0.12.7",
+    "stripe": "^8.102.0"
   },
   "devDependencies": {
     "@types/aws-sdk": "^2.7.0",
@@ -38,6 +39,7 @@
     "@types/passport-google-oauth20": "^2.0.4",
     "@types/passport-local": "^1.0.33",
     "@types/sharp": "^0.26.0",
+    "@types/stripe": "^7.13.24",
     "dotenv": "^8.2.0",
     "nodemon": "^2.0.4",
     "ts-node": "^9.0.0",

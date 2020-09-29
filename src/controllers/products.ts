@@ -3,7 +3,7 @@ import { uploadToS3 } from './../middleware/uploadToS3';
 import express, { Router, Request, Response, NextFunction } from 'express';
 import Product from '../db/models/Product';
 import dotNotate from '../helpers/dotNotate';
-import mongoose from '../db/connection';
+import mongoose from 'mongoose';
 
 const router: Router = express.Router();
 
@@ -95,6 +95,30 @@ router.put('/:id/addRating', async (req: Request, res: Response) => {
     console.log(product?._id, req.params.id);
     console.log(product?._id.equals(req.params.id));
     res.json(product);
+  } catch (err) {
+    res.status(500).json({ name: err.name, message: err.message });
+  }
+});
+
+router.get('/list', async (req: Request, res: Response) => {
+  try {
+    const productIds: mongoose.Types.ObjectId[] = req.body.productIds.map(
+      (id: string) => mongoose.Types.ObjectId(id)
+    );
+    const products = await Product.find({ _id: { $in: productIds } });
+    res.json(products);
+  } catch (err) {
+    res.status(500).json({ name: err.name, message: err.message });
+  }
+});
+
+router.get('/populateCart', async (req: Request, res: Response) => {
+  try {
+    // const productIds: mongoose.Types.ObjectId[] = req.body.map((item: any) =>
+    //   mongoose.Types.ObjectId(item.productId)
+    // );
+    // const products = await Product.find({ _id: { $in: productIds } });
+    // res.json(products);
   } catch (err) {
     res.status(500).json({ name: err.name, message: err.message });
   }

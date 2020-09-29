@@ -1,5 +1,5 @@
-// import { Document, Model } from 'mongoose';
 import mongoose from '../connection';
+import { IProduct } from './Product';
 import { emailRegex, zipRegex } from '../../helpers/validationRegex';
 import { statesList } from '../../helpers/statesList';
 import bcrypt from 'bcrypt';
@@ -13,6 +13,24 @@ interface Address {
   state: string;
   country: string;
   zip: string;
+}
+
+export interface CartItemBase {
+  productId: string;
+  quantity: number;
+}
+export interface CartItem extends CartItemBase {
+  product: IProduct;
+}
+
+export interface IUserBase {
+  name: {
+    first: string;
+    last: string;
+    full?: string;
+  };
+  email: string;
+  password?: string;
 }
 
 export interface IUser extends mongoose.Document {
@@ -30,6 +48,7 @@ export interface IUser extends mongoose.Document {
     country: string;
     zip: string;
   };
+  cart?: CartItem[];
   orders?: string[];
   googleId?: string;
   createdAt?: Date;
@@ -74,6 +93,15 @@ const UserSchema = new Schema(
         }
       }
     },
+    cart: [
+      new Schema(
+        {
+          product: { type: mongoose.Types.ObjectId, ref: 'Product' },
+          quantity: Number
+        },
+        { _id: false }
+      )
+    ],
     orders: [{ type: Schema.Types.ObjectId, ref: 'Order' }],
     googleId: String,
     createdAt: { type: Date, default: Date.now }
