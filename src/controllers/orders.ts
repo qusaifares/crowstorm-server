@@ -1,9 +1,11 @@
+import { IOrder } from './../db/models/Order';
 import express, { Router, Request, Response } from 'express';
 import Order from '../db/models/Order';
+import User from '../db/models/User';
 import dotNotate from '../helpers/dotNotate';
 import Stripe from 'stripe';
 
-const strip = new Stripe(process.env.STRIPE_SECRET as string, {
+const stripe = new Stripe(process.env.STRIPE_SECRET as string, {
   apiVersion: '2020-08-27'
 });
 
@@ -12,10 +14,26 @@ const router: Router = express.Router();
 // Get all orders
 router.get('/', async (req: Request, res: Response) => {
   try {
-    const orders = await Order.find();
+    const { userId } = req.query;
+    const query: any = {};
+    if (userId) query.user = userId;
+    const orders = await Order.find(query).populate('items.product');
     res.json(orders);
   } catch (err) {
     res.status(404).json({ name: err.name, message: err.message });
+  }
+});
+
+router.post('/createIntent', async (req: Request, res: Response) => {
+  try {
+    const total: number = req.body.total;
+    const paymentIntent = await stripe.paymentIntents.create({
+      amount: total, // amount in cents
+      currency: 'usd'
+    });
+    res.status(201).json(paymentIntent);
+  } catch (err) {
+    res.status(500).json({ name: err.name, message: err.message });
   }
 });
 
@@ -32,7 +50,14 @@ router.get('/:id', async (req: Request, res: Response) => {
 // Create an order
 router.post('/', async (req: Request, res: Response) => {
   try {
-    const order = await Order.create(req.body);
+    const orderBody: IOrder = req.body;
+    const order = await Order.create(orderBody);
+    const user = await User.findById(orderBody.user);
+    if (user) {
+      user.orders?.push(order._id);
+      user.save();
+    }
+    console.log(order);
     res.json(order);
   } catch (err) {
     res.status(500).json({ name: err.name, message: err.message });

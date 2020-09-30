@@ -52,10 +52,12 @@ passportCustom(passport);
 import usersController from './controllers/users';
 import productsController from './controllers/products';
 import ordersController from './controllers/orders';
+import paymentsController from './controllers/payments';
 
 app.use('/users', usersController);
 app.use('/products', productsController);
 app.use('/orders', ordersController);
+app.use('/payments', paymentsController);
 
 // Server
 const PORT = process.env.PORT || 8080;

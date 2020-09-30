@@ -24,26 +24,38 @@ interface PaymentInfo {
 }
 
 export interface IOrder extends mongoose.Document {
-  customer: mongoose.Types.ObjectId;
+  user: mongoose.Types.ObjectId;
+  customerInfo: {
+    name: string;
+    email: string;
+    phone: string;
+  };
   items: Item[];
   shippingAddress: Address;
   paymentInfo: PaymentInfo;
-  subtotal: number;
-  tax: number;
-  total: number;
+  amount: number;
   isPaid: boolean;
+  isShipped: boolean;
   orderDate: Date;
   shipDate: Date;
 }
 
 const OrderSchema = new Schema({
-  customer: { type: Schema.Types.ObjectId, ref: 'User' },
+  user: { type: Schema.Types.ObjectId, ref: 'User' },
+  customerInfo: {
+    name: String,
+    email: String,
+    phone: String
+  },
   items: [
-    {
-      product: { type: Schema.Types.ObjectId, ref: 'Product' },
-      price: Number,
-      quantity: Number
-    }
+    new Schema(
+      {
+        product: { type: Schema.Types.ObjectId, ref: 'Product' },
+        price: Number,
+        quantity: Number
+      },
+      { _id: false }
+    )
   ],
   shippingAddress: {
     street: String,
@@ -63,10 +75,9 @@ const OrderSchema = new Schema({
     paymentId: String,
     paymentType: { type: String, enum: ['paypal', 'stripe'] }
   },
-  subtotal: Number,
-  tax: Number,
-  total: Number,
-  isPaid: Boolean,
+  amount: Number,
+  isPaid: { type: Boolean, default: false },
+  isShipped: { type: Boolean, default: false },
   orderDate: { type: Date, default: Date.now },
   shipDate: { type: Date }
 });

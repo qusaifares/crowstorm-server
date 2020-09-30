@@ -25,20 +25,26 @@ router.post('/register', async (req: Request, res: Response) => {
 });
 
 // Persist
-router.post('/persist', (req: Request, res: Response, next: NextFunction) => {
-  try {
-    if (req.session?.user) {
-      req.login(req.session.user, (err) => {
-        if (err) throw new Error('err');
-        res.json(req.user);
-      });
-    } else {
-      throw new Error('Not allowed');
+router.post(
+  '/persist',
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      if (req.session?.user) {
+        req.login(req.session.user, async (err) => {
+          if (err) throw err;
+          console.log(req.session?.user);
+          const user = await User.findById(req.session?.user._id);
+          if (req.session) req.session.user = user;
+          res.json(user);
+        });
+      } else {
+        throw new Error('Not allowed');
+      }
+    } catch (err) {
+      res.status(400).json({ name: err.name, message: err.message });
     }
-  } catch (err) {
-    res.status(400).json({ name: err.name, message: err.message });
   }
-});
+);
 
 router.post('/google', (req: Request, res: Response, next: NextFunction) => {
   passport.authenticate('client-google', (err, user, info) => {
@@ -105,9 +111,9 @@ router.get('/user', async (req: Request, res: Response) => {
 router.get('/cart', async (req: Request, res: Response) => {
   try {
     if (!req.user) throw new Error('No user');
-    const user = await User.findById(req.session?.user._id).populate(
-      'cart.product'
-    );
+    const user = await User.findById(req.session?.user._id)
+      .populate('cart.product')
+      .populate('orders');
     res.json(user);
   } catch (err) {
     res.status(400).json({ name: err.name, message: err.message });
@@ -120,9 +126,13 @@ router.put('/cart', async (req: Request, res: Response) => {
     if (!req.user) throw new Error('No user');
     let user = await User.findById(req.session?.user._id);
     if (!user) throw new Error('No user');
+    console.log('cart >>>', req.body);
     user.cart = req.body;
     user.save();
-    let userPopulated = await user.populate('cart.product').execPopulate();
+    let userPopulated = await user
+      .populate('cart.product')
+      .populate('orders')
+      .execPopulate();
     res.json(userPopulated);
   } catch (err) {
     res.status(400).json({ name: err.name, message: err.message });
@@ -142,7 +152,9 @@ router.get('/', async (req: Request, res: Response) => {
 // Get one user by id
 router.get('/:id', async (req: Request, res: Response) => {
   try {
-    const user = await User.findById(req.params.id);
+    const user = await User.findById(req.params.id)
+      .populate('cart.product')
+      .populate('orders');
     res.json(user);
   } catch (err) {
     res.status(404).json({ name: err.name, message: err.message });

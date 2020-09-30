@@ -1,9 +1,10 @@
+import { CartItem, CartItemBase } from './../db/models/User';
 import { IProduct } from './../db/models/Product';
 import { uploadToS3 } from './../middleware/uploadToS3';
 import express, { Router, Request, Response, NextFunction } from 'express';
 import Product from '../db/models/Product';
 import dotNotate from '../helpers/dotNotate';
-import mongoose from 'mongoose';
+import { Types } from 'mongoose';
 
 const router: Router = express.Router();
 
@@ -100,25 +101,18 @@ router.put('/:id/addRating', async (req: Request, res: Response) => {
   }
 });
 
-router.get('/list', async (req: Request, res: Response) => {
+router.post('/populateCart', async (req: Request, res: Response) => {
   try {
-    const productIds: mongoose.Types.ObjectId[] = req.body.productIds.map(
-      (id: string) => mongoose.Types.ObjectId(id)
-    );
+    const cartBase: CartItemBase[] = req.body;
+    const productIds = cartBase.map((item) => Types.ObjectId(item.product));
     const products = await Product.find({ _id: { $in: productIds } });
-    res.json(products);
-  } catch (err) {
-    res.status(500).json({ name: err.name, message: err.message });
-  }
-});
-
-router.get('/populateCart', async (req: Request, res: Response) => {
-  try {
-    // const productIds: mongoose.Types.ObjectId[] = req.body.map((item: any) =>
-    //   mongoose.Types.ObjectId(item.productId)
-    // );
-    // const products = await Product.find({ _id: { $in: productIds } });
-    // res.json(products);
+    const populatedCart = cartBase.map<CartItem>((item) => ({
+      product: products.find((prod) =>
+        (prod._id as Types.ObjectId).equals(item.product)
+      )!,
+      quantity: item.quantity
+    }));
+    res.json(populatedCart);
   } catch (err) {
     res.status(500).json({ name: err.name, message: err.message });
   }

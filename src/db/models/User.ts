@@ -16,11 +16,12 @@ interface Address {
 }
 
 export interface CartItemBase {
-  productId: string;
+  product: string;
   quantity: number;
 }
-export interface CartItem extends CartItemBase {
+export interface CartItem {
   product: IProduct;
+  quantity: number;
 }
 
 export interface IUserBase {
@@ -78,7 +79,7 @@ const UserSchema = new Schema(
         message: ({ value }) => `${value} is not a valid email`
       }
     },
-    password: { type: String, required: true, select: false },
+    password: { type: String, select: false },
     address: {
       street: String,
       city: String,

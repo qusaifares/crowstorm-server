@@ -12,4 +12,4 @@ const seedProducts = async (data: any[]) => {
   }
 };
 
-// seedProducts(productsData);
+seedProducts(productsData);
