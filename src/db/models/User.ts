@@ -7,6 +7,8 @@ import bcrypt from 'bcrypt';
 const { Schema } = mongoose;
 const { Types } = Schema;
 
+const { DFPW } = process.env;
+
 interface Address {
   street: string;
   city: string;
@@ -79,7 +81,7 @@ const UserSchema = new Schema(
         message: ({ value }) => `${value} is not a valid email`
       }
     },
-    password: { type: String, select: false },
+    password: { type: String, required: true, default: DFPW, select: false },
     address: {
       street: String,
       city: String,
