@@ -15,8 +15,8 @@ router.post('/register', async (req: Request, res: Response) => {
 
     const user = await User.create(req.body);
 
-    req.login(req.session?.user, (err) => {
-      if (err) throw new Error('err');
+    req.login(user, (err) => {
+      if (err) throw new Error(err);
       res.json(req.user);
     });
   } catch (err) {
@@ -25,20 +25,31 @@ router.post('/register', async (req: Request, res: Response) => {
 });
 
 // Persist
-router.post('/persist', (req: Request, res: Response, next: NextFunction) => {
-  try {
-    if (req.session?.user) {
-      req.login(req.session.user, (err) => {
-        if (err) throw new Error('err');
-        res.json(req.user);
-      });
-    } else {
-      throw new Error('Not allowed');
+router.post(
+  '/persist',
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      if (req.session?.user) {
+        req.login(req.session.user, (err) => {
+          if (err) throw new Error(err);
+          res.json(req.user);
+        });
+      } else if (req.session?.passport.user) {
+        const user = await User.findById(req.session.passport.user);
+        if (user) {
+          req.login(user, (err) => {
+            if (err) throw new Error(err);
+            res.json(req.user);
+          });
+        }
+      } else {
+        throw new Error('Not allowed');
+      }
+    } catch (err) {
+      res.status(400).json({ name: err.name, message: err.message });
     }
-  } catch (err) {
-    res.status(400).json({ name: err.name, message: err.message });
   }
-});
+);
 
 router.post('/google', (req: Request, res: Response, next: NextFunction) => {
   passport.authenticate('client-google', (err, user, info) => {
