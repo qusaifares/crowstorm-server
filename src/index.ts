@@ -36,7 +36,7 @@ app.use(
   session({
     secret: SESSION_SECRET,
     resave: true,
-    saveUninitialized: false,
+    saveUninitialized: true,
     cookie: {
       maxAge: hours(SESSION_HOURS),
       secure: NODE_ENV === 'production'
