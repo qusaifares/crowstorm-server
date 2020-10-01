@@ -34,13 +34,13 @@ router.post(
         if (user) {
           req.login(user, (err) => {
             if (err) throw new Error(err);
-            res.json(req.user);
+            res.json(user);
           });
         }
-      } else if (req.session?.user?._id) {
+      } else if (req.session && req.session.user?._id) {
         req.login(req.session.user, (err) => {
           if (err) throw new Error(err);
-          res.json(req.user);
+          res.json(req.session?.user);
         });
       } else {
         throw new Error('Not allowed');
