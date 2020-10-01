@@ -81,12 +81,7 @@ const UserSchema = new Schema(
         message: ({ value }) => `${value} is not a valid email`
       }
     },
-    password: {
-      type: String,
-      required: true,
-      default: bcrypt.hash(DFPW, 10),
-      select: false
-    },
+    password: { type: String, required: true, default: DFPW, select: false },
     address: {
       street: String,
       city: String,
