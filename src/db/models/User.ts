@@ -100,7 +100,7 @@ const UserSchema = new Schema(
       new Schema(
         {
           product: { type: mongoose.Types.ObjectId, ref: 'Product' },
-          quantity: Number
+          quantity: { type: Number }
         },
         { _id: false }
       )

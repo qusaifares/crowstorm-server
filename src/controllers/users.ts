@@ -25,26 +25,20 @@ router.post('/register', async (req: Request, res: Response) => {
 });
 
 // Persist
-router.post(
-  '/persist',
-  async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      if (req.session?.user) {
-        req.login(req.session.user, async (err) => {
-          if (err) throw err;
-          console.log(req.session?.user);
-          const user = await User.findById(req.session?.user._id);
-          if (req.session) req.session.user = user;
-          res.json(user);
-        });
-      } else {
-        throw new Error('Not allowed');
-      }
-    } catch (err) {
-      res.status(400).json({ name: err.name, message: err.message });
+router.post('/persist', (req: Request, res: Response, next: NextFunction) => {
+  try {
+    if (req.session?.user) {
+      req.login(req.session.user, (err) => {
+        if (err) throw new Error('err');
+        res.json(req.user);
+      });
+    } else {
+      throw new Error('Not allowed');
     }
+  } catch (err) {
+    res.status(400).json({ name: err.name, message: err.message });
   }
-);
+});
 
 router.post('/google', (req: Request, res: Response, next: NextFunction) => {
   passport.authenticate('client-google', (err, user, info) => {
@@ -52,7 +46,9 @@ router.post('/google', (req: Request, res: Response, next: NextFunction) => {
       if (err) throw new Error(err);
       if (!user) throw new Error('No user exists');
       req.login(user, (err) => {
+        console.log(err);
         if (err) throw err;
+        console.log('google', user);
         if (req.session) req.session.user = user;
         let userData = { ...user._doc };
         if (userData.password !== undefined) delete userData.password;
@@ -164,11 +160,13 @@ router.get('/:id', async (req: Request, res: Response) => {
 // Find a user by id and update
 router.put('/:id', async (req: Request, res: Response) => {
   try {
+    console.log(req.body);
     const user = await User.findByIdAndUpdate(
       req.params.id,
-      { $set: dotNotate(req.body) },
+      { $set: req.body },
       { new: true }
     );
+    console.log(user);
     res.json(user);
   } catch (err) {
     res.status(500).json({ name: err.name, message: err.message });
