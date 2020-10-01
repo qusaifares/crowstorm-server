@@ -29,12 +29,7 @@ router.post(
   '/persist',
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      if (req.session?.user) {
-        req.login(req.session.user, (err) => {
-          if (err) throw new Error(err);
-          res.json(req.user);
-        });
-      } else if (req.session?.passport.user) {
+      if (req.session?.passport.user) {
         const user = await User.findById(req.session.passport.user);
         if (user) {
           req.login(user, (err) => {
@@ -42,6 +37,11 @@ router.post(
             res.json(req.user);
           });
         }
+      } else if (req.session?.user?._id) {
+        req.login(req.session.user, (err) => {
+          if (err) throw new Error(err);
+          res.json(req.user);
+        });
       } else {
         throw new Error('Not allowed');
       }
