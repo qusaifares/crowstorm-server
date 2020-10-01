@@ -18,7 +18,8 @@ const app: Application = express();
 const {
   SESSION_NAME = 'sid',
   SESSION_HOURS = 24,
-  SESSION_SECRET = 'cookie-secret-code'
+  SESSION_SECRET = 'cookie-secret-code',
+  NODE_ENV
 } = process.env;
 
 // Middleware
@@ -37,7 +38,8 @@ app.use(
     resave: true,
     saveUninitialized: false,
     cookie: {
-      maxAge: hours(SESSION_HOURS)
+      maxAge: hours(SESSION_HOURS),
+      secure: NODE_ENV === 'production'
     },
     store: new MongoStore({ mongooseConnection: mongoose.connection })
   })
